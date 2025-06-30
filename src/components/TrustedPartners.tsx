@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 const TrustedPartners = () => {
@@ -8,6 +7,12 @@ const TrustedPartners = () => {
       logo: "MKU",
       image: "https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=400&h=300&fit=crop&crop=center",
       description: "Leading University in Tamil Nadu"
+    },
+    { 
+      name: "Kalasalingam University", 
+      logo: "KLU",
+      image: "https://images.unsplash.com/photo-1486718448742-163732cd1544?w=400&h=300&fit=crop&crop=center",
+      description: "Excellence in Engineering & Technology"
     },
     { 
       name: "Tamil Nadu Skill Development", 
