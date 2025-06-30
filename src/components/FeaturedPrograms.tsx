@@ -4,23 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Users, Star } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const FeaturedPrograms = () => {
-  const programs = [
-    {
-      id: 1,
-      title: "Art & Craft Classes",
-      description: "Express creativity through various art forms and hands-on craft projects",
-      image: "https://images.unsplash.com/photo-1582562124811-c09040d0a901?auto=format&fit=crop&w=400&q=80",
-      price: "₹2,999",
-      originalPrice: "₹3,999",
-      duration: "6 weeks",
-      students: 124,
-      rating: 4.8,
-      ageRange: "6-16 years",
-      mode: "Offline",
-      category: "Arts"
-    },
+  const featuredPrograms = [
     {
       id: 2,
       title: "Spoken English Class",
@@ -31,20 +18,6 @@ const FeaturedPrograms = () => {
       duration: "8 weeks",
       students: 189,
       rating: 4.9,
-      ageRange: "10+ years",
-      mode: "Hybrid",
-      category: "Language"
-    },
-    {
-      id: 3,
-      title: "Spoken Hindi Class",
-      description: "Learn to speak Hindi fluently with proper pronunciation and grammar",
-      image: "/lovable-uploads/fd7df4fd-8fe5-4faa-9801-d3aabccc5157.png",
-      price: "₹1,799",
-      originalPrice: "₹2,499",
-      duration: "8 weeks",
-      students: 95,
-      rating: 4.7,
       ageRange: "10+ years",
       mode: "Hybrid",
       category: "Language"
@@ -76,76 +49,6 @@ const FeaturedPrograms = () => {
       ageRange: "12+ years",
       mode: "Offline",
       category: "Communication"
-    },
-    {
-      id: 6,
-      title: "Personality Development Class",
-      description: "Transform your personality and build lasting confidence",
-      image: "/lovable-uploads/8b5de2fa-aca2-40f2-9170-0af6794ef7fc.png",
-      price: "₹3,999",
-      originalPrice: "₹5,499",
-      duration: "6 weeks",
-      students: 198,
-      rating: 4.8,
-      ageRange: "15+ years",
-      mode: "Hybrid",
-      category: "Personal"
-    },
-    {
-      id: 7,
-      title: "Career Counseling",
-      description: "Discover your perfect career path with expert guidance and assessment",
-      image: "/lovable-uploads/96cfbc73-aed1-4bef-9de8-5b597d0e461f.png",
-      price: "₹1,499",
-      originalPrice: "₹2,499",
-      duration: "2 sessions",
-      students: 89,
-      rating: 4.9,
-      ageRange: "15+ years",
-      mode: "Online",
-      category: "Career"
-    },
-    {
-      id: 8,
-      title: "Health Insurance",
-      description: "Comprehensive health insurance consultation and planning services",
-      image: "/lovable-uploads/beb09b19-fd17-434b-8096-e9a42a070078.png",
-      price: "₹999",
-      originalPrice: "₹1,499",
-      duration: "1 session",
-      students: 76,
-      rating: 4.6,
-      ageRange: "18+ years",
-      mode: "Online",
-      category: "Insurance"
-    },
-    {
-      id: 9,
-      title: "Tarot Reading",
-      description: "Gain insights into your life journey through professional tarot readings",
-      image: "/lovable-uploads/c07edaf9-7666-4790-8fd5-aa7c87e82621.png",
-      price: "₹599",
-      originalPrice: "₹999",
-      duration: "1 session",
-      students: 134,
-      rating: 4.7,
-      ageRange: "18+ years",
-      mode: "Online",
-      category: "Spiritual"
-    },
-    {
-      id: 10,
-      title: "Business Consulting",
-      description: "Strategic business guidance to grow and scale your venture",
-      image: "/lovable-uploads/8351f715-35d5-45ac-b71f-3294136aa710.png",
-      price: "₹4,999",
-      originalPrice: "₹7,499",
-      duration: "4 sessions",
-      students: 45,
-      rating: 4.9,
-      ageRange: "21+ years",
-      mode: "Hybrid",
-      category: "Business"
     }
   ];
 
@@ -154,15 +57,20 @@ const FeaturedPrograms = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Our Services & Programs
+            Featured Programs
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Comprehensive programs designed to unlock potential and foster personal & professional growth
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-6">
+            Our most popular programs designed to unlock potential and foster personal & professional growth
           </p>
+          <Link to="/programs">
+            <Button variant="outline" className="border-kiki-purple-600 text-kiki-purple-600 hover:bg-kiki-purple-50">
+              View All Programs
+            </Button>
+          </Link>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {programs.map((program) => (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 justify-center">
+          {featuredPrograms.map((program) => (
             <Card key={program.id} className="group overflow-hidden border-0 card-shadow hover:card-shadow-hover transition-all duration-300 hover-scale rounded-2xl">
               <div className="relative overflow-hidden">
                 <img
