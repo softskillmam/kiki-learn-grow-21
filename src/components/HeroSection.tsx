@@ -61,13 +61,13 @@ const HeroSection = () => {
             </div>
           </div>
 
-          {/* Right content - Hero image */}
+          {/* Right content - Hero image showing someone speaking on stage */}
           <div className="flex-1 animate-slide-up">
             <div className="relative">
               <div className="rounded-3xl overflow-hidden card-shadow-hover">
                 <img
-                  src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80"
-                  alt="Student learning"
+                  src="https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?auto=format&fit=crop&w=800&q=80"
+                  alt="Speaker presenting on stage"
                   className="w-full h-auto"
                 />
               </div>
