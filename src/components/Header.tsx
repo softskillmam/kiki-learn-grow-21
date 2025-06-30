@@ -5,11 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, User, ShoppingCart, Search } from 'lucide-react';
 import StudentLoginModal from './StudentLoginModal';
+import UserProfile from './UserProfile';
+import SearchModal from './SearchModal';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [showStudentLogin, setShowStudentLogin] = useState(false);
-  const [isStudentLoggedIn, setIsStudentLoggedIn] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const navItems = [
     { name: 'Home', href: '/' },
@@ -18,6 +22,15 @@ const Header = () => {
     { name: 'Blog', href: '/blog' },
     { name: 'About', href: '/about' },
   ];
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+    setShowLogin(false);
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+  };
 
   return (
     <>
@@ -45,20 +58,30 @@ const Header = () => {
 
             {/* Right side buttons */}
             <div className="hidden md:flex items-center space-x-4">
-              <Button variant="ghost" size="sm">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => setShowSearch(true)}
+              >
                 <Search className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="sm">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => setShowProfile(true)}
+                disabled={!isLoggedIn}
+                className={!isLoggedIn ? 'opacity-50' : ''}
+              >
                 <User className="h-4 w-4" />
               </Button>
               <Button variant="ghost" size="sm">
                 <ShoppingCart className="h-4 w-4" />
               </Button>
-              {isStudentLoggedIn ? (
+              {isLoggedIn ? (
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => setIsStudentLoggedIn(false)}
+                  onClick={handleLogout}
                 >
                   Logout
                 </Button>
@@ -66,9 +89,9 @@ const Header = () => {
                 <Button 
                   size="sm" 
                   className="bg-kiki-purple-600 hover:bg-kiki-purple-700"
-                  onClick={() => setShowStudentLogin(true)}
+                  onClick={() => setShowLogin(true)}
                 >
-                  Student Login
+                  Login
                 </Button>
               )}
             </div>
@@ -92,13 +115,37 @@ const Header = () => {
                       {item.name}
                     </Link>
                   ))}
-                  <div className="pt-4 border-t">
-                    {isStudentLoggedIn ? (
+                  <div className="pt-4 border-t space-y-3">
+                    <Button 
+                      variant="ghost" 
+                      className="w-full justify-start"
+                      onClick={() => {
+                        setShowSearch(true);
+                        setIsOpen(false);
+                      }}
+                    >
+                      <Search className="h-4 w-4 mr-2" />
+                      Search Courses
+                    </Button>
+                    {isLoggedIn && (
+                      <Button 
+                        variant="ghost" 
+                        className="w-full justify-start"
+                        onClick={() => {
+                          setShowProfile(true);
+                          setIsOpen(false);
+                        }}
+                      >
+                        <User className="h-4 w-4 mr-2" />
+                        My Profile
+                      </Button>
+                    )}
+                    {isLoggedIn ? (
                       <Button 
                         variant="outline"
                         className="w-full"
                         onClick={() => {
-                          setIsStudentLoggedIn(false);
+                          handleLogout();
                           setIsOpen(false);
                         }}
                       >
@@ -108,11 +155,11 @@ const Header = () => {
                       <Button 
                         className="w-full bg-kiki-purple-600 hover:bg-kiki-purple-700"
                         onClick={() => {
-                          setShowStudentLogin(true);
+                          setShowLogin(true);
                           setIsOpen(false);
                         }}
                       >
-                        Student Login
+                        Login
                       </Button>
                     )}
                   </div>
@@ -124,9 +171,19 @@ const Header = () => {
       </header>
 
       <StudentLoginModal
-        isOpen={showStudentLogin}
-        onClose={() => setShowStudentLogin(false)}
-        onLogin={() => setIsStudentLoggedIn(true)}
+        isOpen={showLogin}
+        onClose={() => setShowLogin(false)}
+        onLogin={handleLogin}
+      />
+
+      <UserProfile
+        isOpen={showProfile}
+        onClose={() => setShowProfile(false)}
+      />
+
+      <SearchModal
+        isOpen={showSearch}
+        onClose={() => setShowSearch(false)}
       />
     </>
   );

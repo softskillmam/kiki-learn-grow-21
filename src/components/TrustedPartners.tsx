@@ -5,13 +5,13 @@ const TrustedPartners = () => {
     { 
       name: "Madurai Kamaraj University", 
       logo: "MKU",
-      image: "https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=400&h=300&fit=crop&crop=center",
+      image: "/lovable-uploads/aab35988-5b49-4486-86d5-cc8a330fd4c9.png",
       description: "Leading University in Tamil Nadu"
     },
     { 
       name: "Kalasalingam University", 
       logo: "KLU",
-      image: "https://images.unsplash.com/photo-1486718448742-163732cd1544?w=400&h=300&fit=crop&crop=center",
+      image: "/lovable-uploads/1df6daed-3cf6-49c0-8c46-e7a79c003165.png",
       description: "Excellence in Engineering & Technology"
     },
     { 
@@ -41,7 +41,7 @@ const TrustedPartners = () => {
     { 
       name: "Madurai Chamber", 
       logo: "MCC",
-      image: "https://images.unsplash.com/photo-1487252665478-49b61b47f302?w=400&h=300&fit=crop&crop=center",
+      image: "/lovable-uploads/eea1d960-780b-4db1-89ab-648014f584d0.png",
       description: "Business Development Council"
     }
   ];
