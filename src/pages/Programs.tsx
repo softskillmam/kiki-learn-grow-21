@@ -7,7 +7,7 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Users, Star, Loader2 } from 'lucide-react';
+import { Clock, Users, Star, Loader2, ShoppingCart } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
@@ -25,16 +25,34 @@ interface Course {
   total_lessons: number;
 }
 
+interface CartItem {
+  id: string;
+  user_id: string;
+  course_id: string;
+  created_at: string;
+  course: Course;
+}
+
 const Programs = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
     fetchCourses();
-  }, []);
+    if (isAuthenticated) {
+      fetchCartItems();
+      // Show welcome message for new login
+      if (user?.user_metadata?.full_name || user?.user_metadata?.name) {
+        setShowWelcome(true);
+        setTimeout(() => setShowWelcome(false), 5000);
+      }
+    }
+  }, [isAuthenticated, user]);
 
   const fetchCourses = async () => {
     try {
@@ -46,23 +64,83 @@ const Programs = () => {
 
       if (error) {
         console.error('Error fetching courses:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load courses",
-          variant: "destructive",
-        });
       } else {
         setCourses(data || []);
       }
     } catch (error) {
       console.error('Error fetching courses:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load courses",
-        variant: "destructive",
-      });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCartItems = async () => {
+    if (!isAuthenticated || !user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('cart_items')
+        .select(`
+          *,
+          course:courses(*)
+        `)
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error fetching cart items:', error);
+      } else {
+        setCartItems(data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching cart items:', error);
+    }
+  };
+
+  const addToCart = async (courseId: string) => {
+    if (!isAuthenticated || !user) {
+      navigate('/login');
+      return;
+    }
+
+    try {
+      // Check if already in cart
+      const existingItem = cartItems.find(item => item.course_id === courseId);
+      if (existingItem) {
+        toast({
+          title: "Already in Cart",
+          description: "This course is already in your cart.",
+        });
+        return;
+      }
+
+      const { error } = await supabase
+        .from('cart_items')
+        .insert({
+          user_id: user.id,
+          course_id: courseId
+        });
+
+      if (error) {
+        console.error('Error adding to cart:', error);
+        toast({
+          title: "Error",
+          description: "Failed to add course to cart.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Added to Cart",
+          description: "Course added to your cart successfully!",
+        });
+        fetchCartItems();
+      }
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add course to cart.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -78,8 +156,20 @@ const Programs = () => {
     }
   };
 
+  const isInCart = (courseId: string) => {
+    return cartItems.some(item => item.course_id === courseId);
+  };
+
   const getRandomRating = () => (4.6 + Math.random() * 0.4).toFixed(1);
   const getRandomStudents = () => Math.floor(45 + Math.random() * 200);
+
+  const getUserDisplayName = () => {
+    if (!user) return '';
+    return user.user_metadata?.full_name || 
+           user.user_metadata?.name || 
+           user.email?.split('@')[0] || 
+           'User';
+  };
 
   if (loading) {
     return (
@@ -97,6 +187,17 @@ const Programs = () => {
     <div className="min-h-screen">
       <Header />
       <main>
+        {/* Welcome Message */}
+        {showWelcome && isAuthenticated && (
+          <div className="bg-gradient-to-r from-kiki-purple-500 to-kiki-blue-500 text-white py-4">
+            <div className="container mx-auto px-4 text-center">
+              <p className="text-lg font-medium">
+                Welcome back, {getUserDisplayName()}! 🎉
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-kiki-purple-50 via-white to-kiki-blue-50 py-20">
           <div className="container mx-auto px-4 text-center">
@@ -176,13 +277,29 @@ const Programs = () => {
                     </div>
                   </CardContent>
 
-                  <CardFooter className="p-4 pt-0">
-                    <Button 
-                      onClick={() => handleBuyNow(course.id)}
-                      className="w-full bg-kiki-purple-600 hover:bg-kiki-purple-700 text-sm"
-                    >
-                      Buy Now
-                    </Button>
+                  <CardFooter className="p-4 pt-0 space-y-2">
+                    <div className="flex gap-2 w-full">
+                      <Button 
+                        onClick={() => handleBuyNow(course.id)}
+                        className="flex-1 bg-kiki-purple-600 hover:bg-kiki-purple-700 text-sm"
+                      >
+                        Buy Now
+                      </Button>
+                      {isAuthenticated && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => addToCart(course.id)}
+                          disabled={isInCart(course.id)}
+                          className="px-3"
+                        >
+                          <ShoppingCart className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                    {isAuthenticated && isInCart(course.id) && (
+                      <p className="text-xs text-green-600 text-center">Already in cart</p>
+                    )}
                   </CardFooter>
                 </Card>
               ))}

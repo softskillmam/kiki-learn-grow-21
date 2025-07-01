@@ -7,11 +7,13 @@ import { Menu, User, ShoppingCart, Search } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import UserProfile from './UserProfile';
 import SearchModal from './SearchModal';
+import Cart from './Cart';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const [showCart, setShowCart] = useState(false);
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -84,17 +86,28 @@ const Header = () => {
                 <Search className="h-4 w-4" />
               </Button>
               {isAuthenticated && (
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => setShowProfile(true)}
-                >
-                  <User className="h-4 w-4" />
+                <>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => setShowProfile(true)}
+                  >
+                    <User className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => setShowCart(true)}
+                  >
+                    <ShoppingCart className="h-4 w-4" />
+                  </Button>
+                </>
+              )}
+              {!isAuthenticated && (
+                <Button variant="ghost" size="sm">
+                  <ShoppingCart className="h-4 w-4" />
                 </Button>
               )}
-              <Button variant="ghost" size="sm">
-                <ShoppingCart className="h-4 w-4" />
-              </Button>
               {isAuthenticated ? (
                 <Button 
                   variant="outline" 
@@ -159,17 +172,30 @@ const Header = () => {
                       Search Courses
                     </Button>
                     {isAuthenticated && (
-                      <Button 
-                        variant="ghost" 
-                        className="w-full justify-start"
-                        onClick={() => {
-                          setShowProfile(true);
-                          setIsOpen(false);
-                        }}
-                      >
-                        <User className="h-4 w-4 mr-2" />
-                        My Profile
-                      </Button>
+                      <>
+                        <Button 
+                          variant="ghost" 
+                          className="w-full justify-start"
+                          onClick={() => {
+                            setShowProfile(true);
+                            setIsOpen(false);
+                          }}
+                        >
+                          <User className="h-4 w-4 mr-2" />
+                          My Profile
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          className="w-full justify-start"
+                          onClick={() => {
+                            setShowCart(true);
+                            setIsOpen(false);
+                          }}
+                        >
+                          <ShoppingCart className="h-4 w-4 mr-2" />
+                          My Cart
+                        </Button>
+                      </>
                     )}
                     {isAuthenticated ? (
                       <Button 
@@ -202,10 +228,16 @@ const Header = () => {
       </header>
 
       {isAuthenticated && (
-        <UserProfile
-          isOpen={showProfile}
-          onClose={() => setShowProfile(false)}
-        />
+        <>
+          <UserProfile
+            isOpen={showProfile}
+            onClose={() => setShowProfile(false)}
+          />
+          <Cart
+            isOpen={showCart}
+            onClose={() => setShowCart(false)}
+          />
+        </>
       )}
 
       <SearchModal

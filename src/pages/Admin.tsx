@@ -3,7 +3,9 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import LoginModal from '@/components/LoginModal';
+import CourseManager from '@/components/CourseManager';
 
 const Admin = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -65,48 +67,61 @@ const Admin = () => {
 
       <main className="p-6">
         <div className="max-w-7xl mx-auto">
-          {/* Stats Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {stats.map((stat, index) => (
-              <Card key={index}>
-                <CardContent className="p-6">
-                  <div className="text-2xl font-bold text-kiki-purple-600">{stat.value}</div>
-                  <p className="text-sm text-gray-600">{stat.label}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <Tabs defaultValue="overview" className="space-y-6">
+            <TabsList>
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="courses">Courses</TabsTrigger>
+            </TabsList>
 
-          {/* Services Management */}
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>Services Offered</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {services.map((service, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <span className="text-sm font-medium">{service}</span>
-                    <Badge variant="outline">Active</Badge>
-                  </div>
+            <TabsContent value="overview" className="space-y-6">
+              {/* Stats Overview */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {stats.map((stat, index) => (
+                  <Card key={index}>
+                    <CardContent className="p-6">
+                      <div className="text-2xl font-bold text-kiki-purple-600">{stat.value}</div>
+                      <p className="text-sm text-gray-600">{stat.label}</p>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
-            </CardContent>
-          </Card>
 
-          {/* Contact Info */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Contact Information</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <p><strong>Phone:</strong> 8220879805</p>
-                <p><strong>Location:</strong> Madurai, Tamil Nadu, India</p>
-                <p><strong>Focus:</strong> Soft Skills & Career Development</p>
-              </div>
-            </CardContent>
-          </Card>
+              {/* Services Management */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Services Offered</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {services.map((service, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <span className="text-sm font-medium">{service}</span>
+                        <Badge variant="outline">Active</Badge>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Contact Info */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Contact Information</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <p><strong>Phone:</strong> 8220879805</p>
+                    <p><strong>Location:</strong> Madurai, Tamil Nadu, India</p>
+                    <p><strong>Focus:</strong> Soft Skills & Career Development</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="courses">
+              <CourseManager />
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
     </div>
