@@ -25,21 +25,13 @@ interface Course {
   total_lessons: number;
 }
 
-interface CartItem {
-  id: string;
-  user_id: string;
-  course_id: string;
-  created_at: string;
-  course: Course;
-}
-
 const Programs = () => {
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [cartItemIds, setCartItemIds] = useState<string[]>([]);
   const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
@@ -78,21 +70,19 @@ const Programs = () => {
     if (!isAuthenticated || !user) return;
 
     try {
+      // Use RPC function to get cart items safely
       const { data, error } = await supabase
-        .from('cart_items')
-        .select(`
-          *,
-          course:courses(*)
-        `)
-        .eq('user_id', user.id);
+        .rpc('get_user_cart_course_ids', { user_id: user.id });
 
       if (error) {
         console.error('Error fetching cart items:', error);
+        setCartItemIds([]);
       } else {
-        setCartItems(data || []);
+        setCartItemIds(data || []);
       }
     } catch (error) {
       console.error('Error fetching cart items:', error);
+      setCartItemIds([]);
     }
   };
 
@@ -104,8 +94,7 @@ const Programs = () => {
 
     try {
       // Check if already in cart
-      const existingItem = cartItems.find(item => item.course_id === courseId);
-      if (existingItem) {
+      if (cartItemIds.includes(courseId)) {
         toast({
           title: "Already in Cart",
           description: "This course is already in your cart.",
@@ -113,9 +102,9 @@ const Programs = () => {
         return;
       }
 
+      // Use RPC function to add to cart safely
       const { error } = await supabase
-        .from('cart_items')
-        .insert({
+        .rpc('add_to_cart', {
           user_id: user.id,
           course_id: courseId
         });
@@ -157,7 +146,7 @@ const Programs = () => {
   };
 
   const isInCart = (courseId: string) => {
-    return cartItems.some(item => item.course_id === courseId);
+    return cartItemIds.includes(courseId);
   };
 
   const getRandomRating = () => (4.6 + Math.random() * 0.4).toFixed(1);

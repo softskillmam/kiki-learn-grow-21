@@ -13,6 +13,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 
+type CourseStatus = 'active' | 'inactive' | 'archived';
+
 interface Course {
   id: string;
   title: string;
@@ -24,7 +26,7 @@ interface Course {
   category: string;
   age_range: string;
   mode: string;
-  status: string;
+  status: CourseStatus;
   total_lessons: number;
 }
 
@@ -45,7 +47,7 @@ const CourseManager: React.FC = () => {
     category: '',
     age_range: '',
     mode: '',
-    status: 'active',
+    status: 'active' as CourseStatus,
     total_lessons: ''
   });
 
@@ -89,7 +91,7 @@ const CourseManager: React.FC = () => {
       category: course.category || '',
       age_range: course.age_range || '',
       mode: course.mode || '',
-      status: course.status,
+      status: course.status || 'active',
       total_lessons: course.total_lessons?.toString() || ''
     });
     setIsDialogOpen(true);
@@ -381,7 +383,10 @@ const CourseManager: React.FC = () => {
               </div>
               <div>
                 <Label htmlFor="status">Status</Label>
-                <Select value={formData.status} onValueChange={(value) => setFormData({...formData, status: value})}>
+                <Select 
+                  value={formData.status} 
+                  onValueChange={(value: CourseStatus) => setFormData({...formData, status: value})}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>

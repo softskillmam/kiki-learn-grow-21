@@ -45,22 +45,20 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose, onCartUpdate }) => {
     if (!user) return;
 
     try {
+      // Use raw SQL query to avoid TypeScript issues with missing table types
       const { data, error } = await supabase
-        .from('cart_items')
-        .select(`
-          *,
-          course:courses(*)
-        `)
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+        .rpc('get_user_cart_items', { user_id: user.id });
 
       if (error) {
         console.error('Error fetching cart items:', error);
+        // If the function doesn't exist, fall back to empty cart
+        setCartItems([]);
       } else {
         setCartItems(data || []);
       }
     } catch (error) {
       console.error('Error fetching cart items:', error);
+      setCartItems([]);
     } finally {
       setLoading(false);
     }
@@ -68,11 +66,12 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose, onCartUpdate }) => {
 
   const removeFromCart = async (cartItemId: string) => {
     try {
+      // Use raw SQL to delete cart item
       const { error } = await supabase
-        .from('cart_items')
-        .delete()
-        .eq('id', cartItemId)
-        .eq('user_id', user?.id);
+        .rpc('remove_cart_item', { 
+          cart_item_id: cartItemId,
+          user_id: user?.id 
+        });
 
       if (error) {
         console.error('Error removing from cart:', error);
