@@ -1,13 +1,26 @@
-
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Users, Star } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Programs = () => {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  const handleBuyNow = () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+    } else {
+      // Here you would handle the actual enrollment/payment logic
+      alert('Redirecting to payment/enrollment...');
+    }
+  };
+
   const allPrograms = [
     {
       id: 1,
@@ -233,8 +246,11 @@ const Programs = () => {
                   </CardContent>
 
                   <CardFooter className="p-4 pt-0">
-                    <Button className="w-full bg-kiki-purple-600 hover:bg-kiki-purple-700 text-sm">
-                      Learn More
+                    <Button 
+                      onClick={handleBuyNow}
+                      className="w-full bg-kiki-purple-600 hover:bg-kiki-purple-700 text-sm"
+                    >
+                      Buy Now
                     </Button>
                   </CardFooter>
                 </Card>

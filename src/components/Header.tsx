@@ -1,36 +1,44 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, User, ShoppingCart, Search } from 'lucide-react';
-import StudentLoginModal from './StudentLoginModal';
+import { useAuth } from '@/contexts/AuthContext';
 import UserProfile from './UserProfile';
 import SearchModal from './SearchModal';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [showLogin, setShowLogin] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  const navItems = [
-    { name: 'Home', href: '/' },
-    { name: 'Programs', href: '/collections' },
-    { name: 'Career Test', href: '/career-test' },
-    { name: 'Blog', href: '/blog' },
-    { name: 'About', href: '/about' },
-  ];
-
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-    setShowLogin(false);
-  };
+  const { isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
+    logout();
+    navigate('/');
   };
+
+  const handleProtectedNavigation = (path: string) => {
+    if (!isAuthenticated) {
+      navigate('/login');
+    } else {
+      navigate(path);
+    }
+  };
+
+  const navItems = isAuthenticated ? [
+    { name: 'Home', href: '/' },
+    { name: 'Enrolled Courses', href: '/enrolled-courses', protected: true },
+    { name: 'Explore Programs', href: '/programs' },
+    { name: 'Take Career Test', href: '/career-test', protected: true },
+    { name: 'About', href: '/about' },
+  ] : [
+    { name: 'Home', href: '/' },
+    { name: 'Programs', href: '/programs' },
+    { name: 'About', href: '/about' },
+  ];
 
   return (
     <>
@@ -46,13 +54,23 @@ const Header = () => {
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
               {navItems.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className="text-sm font-medium text-gray-700 hover:text-kiki-purple-600 transition-colors"
-                >
-                  {item.name}
-                </Link>
+                item.protected ? (
+                  <button
+                    key={item.name}
+                    onClick={() => handleProtectedNavigation(item.href)}
+                    className="text-sm font-medium text-gray-700 hover:text-kiki-purple-600 transition-colors cursor-pointer"
+                  >
+                    {item.name}
+                  </button>
+                ) : (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    className="text-sm font-medium text-gray-700 hover:text-kiki-purple-600 transition-colors"
+                  >
+                    {item.name}
+                  </Link>
+                )
               ))}
             </nav>
 
@@ -65,19 +83,19 @@ const Header = () => {
               >
                 <Search className="h-4 w-4" />
               </Button>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => setShowProfile(true)}
-                disabled={!isLoggedIn}
-                className={!isLoggedIn ? 'opacity-50' : ''}
-              >
-                <User className="h-4 w-4" />
-              </Button>
+              {isAuthenticated && (
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setShowProfile(true)}
+                >
+                  <User className="h-4 w-4" />
+                </Button>
+              )}
               <Button variant="ghost" size="sm">
                 <ShoppingCart className="h-4 w-4" />
               </Button>
-              {isLoggedIn ? (
+              {isAuthenticated ? (
                 <Button 
                   variant="outline" 
                   size="sm"
@@ -89,7 +107,7 @@ const Header = () => {
                 <Button 
                   size="sm" 
                   className="bg-kiki-purple-600 hover:bg-kiki-purple-700"
-                  onClick={() => setShowLogin(true)}
+                  onClick={() => navigate('/login')}
                 >
                   Login
                 </Button>
@@ -106,14 +124,27 @@ const Header = () => {
               <SheetContent side="right" className="w-[300px]">
                 <div className="flex flex-col space-y-4 mt-8">
                   {navItems.map((item) => (
-                    <Link
-                      key={item.name}
-                      to={item.href}
-                      className="text-lg font-medium text-gray-700 hover:text-kiki-purple-600 transition-colors"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      {item.name}
-                    </Link>
+                    item.protected ? (
+                      <button
+                        key={item.name}
+                        onClick={() => {
+                          handleProtectedNavigation(item.href);
+                          setIsOpen(false);
+                        }}
+                        className="text-lg font-medium text-gray-700 hover:text-kiki-purple-600 transition-colors text-left"
+                      >
+                        {item.name}
+                      </button>
+                    ) : (
+                      <Link
+                        key={item.name}
+                        to={item.href}
+                        className="text-lg font-medium text-gray-700 hover:text-kiki-purple-600 transition-colors"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        {item.name}
+                      </Link>
+                    )
                   ))}
                   <div className="pt-4 border-t space-y-3">
                     <Button 
@@ -127,7 +158,7 @@ const Header = () => {
                       <Search className="h-4 w-4 mr-2" />
                       Search Courses
                     </Button>
-                    {isLoggedIn && (
+                    {isAuthenticated && (
                       <Button 
                         variant="ghost" 
                         className="w-full justify-start"
@@ -140,7 +171,7 @@ const Header = () => {
                         My Profile
                       </Button>
                     )}
-                    {isLoggedIn ? (
+                    {isAuthenticated ? (
                       <Button 
                         variant="outline"
                         className="w-full"
@@ -155,7 +186,7 @@ const Header = () => {
                       <Button 
                         className="w-full bg-kiki-purple-600 hover:bg-kiki-purple-700"
                         onClick={() => {
-                          setShowLogin(true);
+                          navigate('/login');
                           setIsOpen(false);
                         }}
                       >
@@ -170,16 +201,12 @@ const Header = () => {
         </div>
       </header>
 
-      <StudentLoginModal
-        isOpen={showLogin}
-        onClose={() => setShowLogin(false)}
-        onLogin={handleLogin}
-      />
-
-      <UserProfile
-        isOpen={showProfile}
-        onClose={() => setShowProfile(false)}
-      />
+      {isAuthenticated && (
+        <UserProfile
+          isOpen={showProfile}
+          onClose={() => setShowProfile(false)}
+        />
+      )}
 
       <SearchModal
         isOpen={showSearch}
