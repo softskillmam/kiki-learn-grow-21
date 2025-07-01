@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -67,18 +66,21 @@ const Programs = () => {
   };
 
   const fetchCartItems = async () => {
-    if (!isAuthenticated || !user) return;
+    if (!isAuthenticated || !user?.id) return;
 
     try {
-      // Use RPC function to get cart items safely
+      // Use direct query instead of RPC to avoid TypeScript issues
       const { data, error } = await supabase
-        .rpc('get_user_cart_course_ids', { user_id: user.id });
+        .from('cart_items')
+        .select('course_id')
+        .eq('user_id', user.id);
 
       if (error) {
         console.error('Error fetching cart items:', error);
         setCartItemIds([]);
       } else {
-        setCartItemIds(data || []);
+        const courseIds = data?.map(item => item.course_id) || [];
+        setCartItemIds(courseIds);
       }
     } catch (error) {
       console.error('Error fetching cart items:', error);
@@ -87,7 +89,7 @@ const Programs = () => {
   };
 
   const addToCart = async (courseId: string) => {
-    if (!isAuthenticated || !user) {
+    if (!isAuthenticated || !user?.id) {
       navigate('/login');
       return;
     }
@@ -102,9 +104,10 @@ const Programs = () => {
         return;
       }
 
-      // Use RPC function to add to cart safely
+      // Use direct insert instead of RPC to avoid TypeScript issues
       const { error } = await supabase
-        .rpc('add_to_cart', {
+        .from('cart_items')
+        .insert({
           user_id: user.id,
           course_id: courseId
         });

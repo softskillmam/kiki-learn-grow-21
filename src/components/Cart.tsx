@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -42,19 +41,33 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose, onCartUpdate }) => {
   }, [isOpen, isAuthenticated, user]);
 
   const fetchCartItems = async () => {
-    if (!user) return;
+    if (!user?.id) return;
 
     try {
-      // Use raw SQL query to avoid TypeScript issues with missing table types
-      const { data, error } = await supabase
-        .rpc('get_user_cart_items', { user_id: user.id });
+      // Use direct query instead of RPC to avoid TypeScript issues
+      const { data: cartData, error: cartError } = await supabase
+        .from('cart_items')
+        .select(`
+          id,
+          user_id,
+          course_id,
+          created_at,
+          course:courses (
+            id,
+            title,
+            description,
+            image_url,
+            price,
+            original_price
+          )
+        `)
+        .eq('user_id', user.id);
 
-      if (error) {
-        console.error('Error fetching cart items:', error);
-        // If the function doesn't exist, fall back to empty cart
+      if (cartError) {
+        console.error('Error fetching cart items:', cartError);
         setCartItems([]);
       } else {
-        setCartItems(data || []);
+        setCartItems(cartData || []);
       }
     } catch (error) {
       console.error('Error fetching cart items:', error);
@@ -65,13 +78,15 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose, onCartUpdate }) => {
   };
 
   const removeFromCart = async (cartItemId: string) => {
+    if (!user?.id) return;
+
     try {
-      // Use raw SQL to delete cart item
+      // Use direct delete instead of RPC to avoid TypeScript issues
       const { error } = await supabase
-        .rpc('remove_cart_item', { 
-          cart_item_id: cartItemId,
-          user_id: user?.id 
-        });
+        .from('cart_items')
+        .delete()
+        .eq('id', cartItemId)
+        .eq('user_id', user.id);
 
       if (error) {
         console.error('Error removing from cart:', error);
