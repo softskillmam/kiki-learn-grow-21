@@ -35,6 +35,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const fetchProfile = async (userId: string) => {
     try {
+      console.log('Fetching profile for user ID:', userId);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -45,6 +46,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         console.error('Error fetching profile:', error);
         return null;
       }
+      console.log('Profile fetched:', data);
       return data;
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -63,6 +65,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         if (session?.user) {
           const userProfile = await fetchProfile(session.user.id);
           setProfile(userProfile);
+          console.log('User profile set:', userProfile);
         } else {
           setProfile(null);
         }
@@ -89,18 +92,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const login = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      console.log('Attempting login for email:', email);
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
+        console.error('Login error details:', error);
         toast({
           title: "Login Failed",
           description: error.message,
           variant: "destructive",
         });
       } else {
+        console.log('Login successful:', data);
         toast({
           title: "Welcome back!",
           description: "You have been successfully logged in.",
@@ -207,6 +213,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     logout,
     loading,
   };
+
+  console.log('Auth context values:', {
+    isAuthenticated: !!user,
+    isAdmin: profile?.role === 'admin',
+    userRole: profile?.role,
+    userEmail: user?.email
+  });
 
   return (
     <AuthContext.Provider value={value}>
