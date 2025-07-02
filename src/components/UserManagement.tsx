@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Search, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
 
 interface User {
   id: string;
@@ -46,7 +47,16 @@ const UserManagement: React.FC = () => {
           variant: "destructive",
         });
       } else {
-        setUsers(data.users || []);
+        // Convert Supabase users to our User interface
+        const formattedUsers: User[] = (data.users || []).map((user: SupabaseUser) => ({
+          id: user.id,
+          email: user.email || '',
+          created_at: user.created_at,
+          last_sign_in_at: user.last_sign_in_at || '',
+          email_confirmed_at: user.email_confirmed_at || '',
+          user_metadata: user.user_metadata || {}
+        }));
+        setUsers(formattedUsers);
       }
     } catch (error) {
       console.error('Error fetching users:', error);

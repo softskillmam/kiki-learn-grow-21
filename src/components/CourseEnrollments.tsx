@@ -15,7 +15,7 @@ interface Course {
 
 interface Enrollment {
   id: string;
-  user_id: string;
+  student_id: string;
   course_id: string;
   enrolled_at: string;
   status: string;
@@ -64,7 +64,7 @@ const CourseEnrollments: React.FC = () => {
           .from('enrollments')
           .select(`
             id,
-            user_id,
+            student_id,
             course_id,
             enrolled_at,
             status,
@@ -81,7 +81,7 @@ const CourseEnrollments: React.FC = () => {
         const enrichedEnrollments: Enrollment[] = [];
         for (const enrollment of enrollments || []) {
           try {
-            const { data: userData } = await supabase.auth.admin.getUserById(enrollment.user_id);
+            const { data: userData } = await supabase.auth.admin.getUserById(enrollment.student_id);
             enrichedEnrollments.push({
               ...enrollment,
               user_email: userData.user?.email || 'Unknown',
