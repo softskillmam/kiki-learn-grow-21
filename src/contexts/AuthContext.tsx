@@ -4,19 +4,10 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-interface Profile {
-  id: string;
-  email: string;
-  full_name: string | null;
-  role: 'student' | 'admin' | 'instructor';
-}
-
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  profile: Profile | null;
   isAuthenticated: boolean;
-  isAdmin: boolean;
   login: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string, fullName?: string) => Promise<{ error: any }>;
   signInWithGoogle: () => Promise<{ error: any }>;
@@ -29,30 +20,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-
-  const fetchProfile = async (userId: string) => {
-    try {
-      console.log('Fetching profile for user ID:', userId);
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      if (error) {
-        console.error('Error fetching profile:', error);
-        return null;
-      }
-      console.log('Profile fetched:', data);
-      return data;
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-      return null;
-    }
-  };
 
   useEffect(() => {
     // Set up auth state listener
@@ -61,29 +30,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         console.log('Auth state changed:', event, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          const userProfile = await fetchProfile(session.user.id);
-          setProfile(userProfile);
-          console.log('User profile set:', userProfile);
-        } else {
-          setProfile(null);
-        }
-        
         setLoading(false);
       }
     );
 
     // Get initial session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        const userProfile = await fetchProfile(session.user.id);
-        setProfile(userProfile);
-      }
-      
       setLoading(false);
     });
 
@@ -92,21 +46,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const login = async (email: string, password: string) => {
     try {
-      console.log('Attempting login for email:', email);
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
-        console.error('Login error details:', error);
         toast({
           title: "Login Failed",
           description: error.message,
           variant: "destructive",
         });
       } else {
-        console.log('Login successful:', data);
         toast({
           title: "Welcome back!",
           description: "You have been successfully logged in.",
@@ -183,71 +134,34 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const logout = async () => {
     try {
-      console.log('Attempting logout...');
-      
-      // Clear local state first
-      setUser(null);
-      setSession(null);
-      setProfile(null);
-      
-      // Sign out from Supabase
       const { error } = await supabase.auth.signOut();
-      
       if (error) {
-        console.error('Logout error:', error);
         toast({
           title: "Logout Failed",
           description: error.message,
           variant: "destructive",
         });
-        
-        // Re-fetch current session if logout failed
-        const { data: { session } } = await supabase.auth.getSession();
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          const userProfile = await fetchProfile(session.user.id);
-          setProfile(userProfile);
-        }
       } else {
-        console.log('Logout successful');
         toast({
           title: "Logged Out",
           description: "You have been successfully logged out.",
         });
-        
-        // Force a page reload to ensure clean state
-        window.location.href = '/';
       }
     } catch (error) {
       console.error('Logout error:', error);
-      toast({
-        title: "Logout Failed",
-        description: "An unexpected error occurred during logout.",
-        variant: "destructive",
-      });
     }
   };
 
   const value = {
     user,
     session,
-    profile,
     isAuthenticated: !!user,
-    isAdmin: profile?.role === 'admin',
     login,
     signUp,
     signInWithGoogle,
     logout,
     loading,
   };
-
-  console.log('Auth context values:', {
-    isAuthenticated: !!user,
-    isAdmin: profile?.role === 'admin',
-    userRole: profile?.role,
-    userEmail: user?.email
-  });
 
   return (
     <AuthContext.Provider value={value}>

@@ -1,61 +1,52 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import LoginModal from '@/components/LoginModal';
 import CourseManager from '@/components/CourseManager';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
-import { Loader2, Users } from 'lucide-react';
 
 const Admin = () => {
-  const { logout } = useAuth();
-  const [stats, setStats] = useState({
-    totalUsers: 0,
-    totalCourses: 0,
-    totalEnrollments: 0,
-    completionRate: 0
-  });
-  const [loading, setLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(!isLoggedIn);
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
+  const services = [
+    'Parampara Summer Camp',
+    'Art & Craft Classes', 
+    'Spoken English Class',
+    'Spoken Hindi Class',
+    'Soft Skill Training',
+    'Public Speaking',
+    'Personality Development Class',
+    'Career Counseling',
+    'Health Insurance',
+    'Tarot Reading',
+    'Business Consulting'
+  ];
 
-  const fetchStats = async () => {
-    try {
-      const [usersResult, coursesResult, enrollmentsResult] = await Promise.all([
-        supabase.from('profiles').select('id', { count: 'exact' }),
-        supabase.from('courses').select('id', { count: 'exact' }).eq('status', 'active'),
-        supabase.from('enrollments').select('id, status', { count: 'exact' })
-      ]);
+  const stats = [
+    { label: 'Total Students', value: '245' },
+    { label: 'Active Programs', value: '11' },
+    { label: 'Completion Rate', value: '94%' },
+    { label: 'Partner Organizations', value: '6' }
+  ];
 
-      const totalUsers = usersResult.count || 0;
-      const totalCourses = coursesResult.count || 0;
-      const totalEnrollments = enrollmentsResult.count || 0;
-      
-      // Calculate completion rate
-      const completedEnrollments = enrollmentsResult.data?.filter(e => e.status === 'completed').length || 0;
-      const completionRate = totalEnrollments > 0 ? Math.round((completedEnrollments / totalEnrollments) * 100) : 0;
-
-      setStats({
-        totalUsers,
-        totalCourses,
-        totalEnrollments,
-        completionRate
-      });
-    } catch (error) {
-      console.error('Error fetching stats:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
+  if (!isLoggedIn) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-kiki-purple-600" />
+        <LoginModal 
+          isOpen={showLoginModal} 
+          onClose={() => setShowLoginModal(false)}
+          onLogin={() => setIsLoggedIn(true)}
+        />
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Admin Access Required</h1>
+          <p className="text-gray-600 mb-6">Please login to access the admin panel</p>
+          <Button onClick={() => setShowLoginModal(true)}>
+            Login to Admin Panel
+          </Button>
+        </div>
       </div>
     );
   }
@@ -67,7 +58,7 @@ const Admin = () => {
           <h1 className="text-2xl font-bold text-gray-900">KIKI's Learning Hub - Admin Panel</h1>
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-600">Madurai, Tamil Nadu</span>
-            <Button variant="outline" onClick={logout}>
+            <Button variant="outline" onClick={() => setIsLoggedIn(false)}>
               Logout
             </Button>
           </div>
@@ -80,40 +71,37 @@ const Admin = () => {
             <TabsList>
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="courses">Courses</TabsTrigger>
-              <TabsTrigger value="users">Users</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="space-y-6">
               {/* Stats Overview */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Users className="h-5 w-5 text-kiki-purple-600" />
-                      <span className="text-sm text-gray-600">Total Users</span>
-                    </div>
-                    <div className="text-2xl font-bold text-kiki-purple-600">{stats.totalUsers}</div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="text-2xl font-bold text-kiki-purple-600">{stats.totalCourses}</div>
-                    <p className="text-sm text-gray-600">Active Courses</p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="text-2xl font-bold text-kiki-purple-600">{stats.totalEnrollments}</div>
-                    <p className="text-sm text-gray-600">Total Enrollments</p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="text-2xl font-bold text-kiki-purple-600">{stats.completionRate}%</div>
-                    <p className="text-sm text-gray-600">Completion Rate</p>
-                  </CardContent>
-                </Card>
+                {stats.map((stat, index) => (
+                  <Card key={index}>
+                    <CardContent className="p-6">
+                      <div className="text-2xl font-bold text-kiki-purple-600">{stat.value}</div>
+                      <p className="text-sm text-gray-600">{stat.label}</p>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
+
+              {/* Services Management */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Services Offered</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {services.map((service, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <span className="text-sm font-medium">{service}</span>
+                        <Badge variant="outline">Active</Badge>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
 
               {/* Contact Info */}
               <Card>
@@ -132,19 +120,6 @@ const Admin = () => {
 
             <TabsContent value="courses">
               <CourseManager />
-            </TabsContent>
-
-            <TabsContent value="users">
-              <Card>
-                <CardHeader>
-                  <CardTitle>User Management</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-8">
-                    <p className="text-gray-500">User management features coming soon...</p>
-                  </div>
-                </CardContent>
-              </Card>
             </TabsContent>
           </Tabs>
         </div>
