@@ -67,11 +67,29 @@ BEGIN
     NOW()
   );
   
-  -- Log success
-  RAISE NOTICE 'Admin account created successfully with ID: %', admin_user_id;
+  -- Verify the account was created
+  IF EXISTS (SELECT 1 FROM auth.users WHERE email = 'kiki@admin.com') THEN
+    RAISE NOTICE 'Admin account created successfully with ID: %', admin_user_id;
+  ELSE
+    RAISE EXCEPTION 'Failed to create admin account';
+  END IF;
   
 EXCEPTION
   WHEN OTHERS THEN
     RAISE NOTICE 'Error creating admin account: %', SQLERRM;
     RAISE;
+END $$;
+
+-- Additional verification query
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM auth.users WHERE email = 'kiki@admin.com') THEN
+    RAISE EXCEPTION 'Admin account verification failed - account does not exist';
+  END IF;
+  
+  IF NOT EXISTS (SELECT 1 FROM public.profiles WHERE email = 'kiki@admin.com' AND role = 'admin') THEN
+    RAISE EXCEPTION 'Admin profile verification failed - profile does not exist or role is incorrect';
+  END IF;
+  
+  RAISE NOTICE 'Admin account verification successful';
 END $$;

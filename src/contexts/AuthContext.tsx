@@ -183,21 +183,49 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const logout = async () => {
     try {
+      console.log('Attempting logout...');
+      
+      // Clear local state first
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      
+      // Sign out from Supabase
       const { error } = await supabase.auth.signOut();
+      
       if (error) {
+        console.error('Logout error:', error);
         toast({
           title: "Logout Failed",
           description: error.message,
           variant: "destructive",
         });
+        
+        // Re-fetch current session if logout failed
+        const { data: { session } } = await supabase.auth.getSession();
+        setSession(session);
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          const userProfile = await fetchProfile(session.user.id);
+          setProfile(userProfile);
+        }
       } else {
+        console.log('Logout successful');
         toast({
           title: "Logged Out",
           description: "You have been successfully logged out.",
         });
+        
+        // Force a page reload to ensure clean state
+        window.location.href = '/';
       }
     } catch (error) {
       console.error('Logout error:', error);
+      toast({
+        title: "Logout Failed",
+        description: "An unexpected error occurred during logout.",
+        variant: "destructive",
+      });
     }
   };
 
