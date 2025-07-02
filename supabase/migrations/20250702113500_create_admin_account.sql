@@ -1,17 +1,10 @@
 
--- First, delete any existing admin account to avoid conflicts
-DELETE FROM auth.users WHERE email = 'kiki@admin.com';
-DELETE FROM public.profiles WHERE email = 'kiki@admin.com';
-
 -- Insert admin account into auth.users and profiles
 DO $$
 DECLARE
   admin_user_id UUID;
 BEGIN
-  -- Generate a new UUID for the admin user
-  admin_user_id := gen_random_uuid();
-  
-  -- Insert admin user into auth.users with proper password hashing
+  -- Insert admin user into auth.users
   INSERT INTO auth.users (
     id,
     instance_id,
@@ -20,7 +13,7 @@ BEGIN
     email,
     encrypted_password,
     email_confirmed_at,
-    email_change_confirm_status,
+    recovery_sent_at,
     last_sign_in_at,
     raw_app_meta_data,
     raw_user_meta_data,
@@ -31,26 +24,27 @@ BEGIN
     email_change_token_new,
     recovery_token
   ) VALUES (
-    admin_user_id,
+    gen_random_uuid(),
     '00000000-0000-0000-0000-000000000000',
     'authenticated',
     'authenticated',
     'kiki@admin.com',
     crypt('KIKI@123', gen_salt('bf')),
     NOW(),
-    0,
+    NOW(),
     NOW(),
     '{"provider": "email", "providers": ["email"]}',
-    '{"full_name": "KIKI Admin"}',
+    '{"full_name": "KIKI"}',
     NOW(),
     NOW(),
     '',
     '',
     '',
     ''
-  );
+  )
+  RETURNING id INTO admin_user_id;
 
-  -- Insert admin profile with explicit admin role
+  -- Insert admin profile
   INSERT INTO public.profiles (
     id,
     email,
@@ -61,35 +55,9 @@ BEGIN
   ) VALUES (
     admin_user_id,
     'kiki@admin.com',
-    'KIKI Admin',
+    'KIKI',
     'admin',
     NOW(),
     NOW()
   );
-  
-  -- Verify the account was created
-  IF EXISTS (SELECT 1 FROM auth.users WHERE email = 'kiki@admin.com') THEN
-    RAISE NOTICE 'Admin account created successfully with ID: %', admin_user_id;
-  ELSE
-    RAISE EXCEPTION 'Failed to create admin account';
-  END IF;
-  
-EXCEPTION
-  WHEN OTHERS THEN
-    RAISE NOTICE 'Error creating admin account: %', SQLERRM;
-    RAISE;
-END $$;
-
--- Additional verification query
-DO $$
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM auth.users WHERE email = 'kiki@admin.com') THEN
-    RAISE EXCEPTION 'Admin account verification failed - account does not exist';
-  END IF;
-  
-  IF NOT EXISTS (SELECT 1 FROM public.profiles WHERE email = 'kiki@admin.com' AND role = 'admin') THEN
-    RAISE EXCEPTION 'Admin profile verification failed - profile does not exist or role is incorrect';
-  END IF;
-  
-  RAISE NOTICE 'Admin account verification successful';
 END $$;
