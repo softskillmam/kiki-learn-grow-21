@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, User, ShoppingCart, Search } from 'lucide-react';
+import { Menu, User, ShoppingCart, Search, Badge } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCart } from '@/contexts/CartContext';
 import UserProfile from './UserProfile';
 import SearchModal from './SearchModal';
 import Cart from './Cart';
@@ -15,6 +16,7 @@ const Header = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [showCart, setShowCart] = useState(false);
   const { isAuthenticated, logout } = useAuth();
+  const { cartCount } = useCart();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -33,7 +35,7 @@ const Header = () => {
   const navItems = isAuthenticated ? [
     { name: 'Home', href: '/' },
     { name: 'Enrolled Courses', href: '/enrolled-courses', protected: true },
-    { name: 'Explore Programs', href: '/programs' },
+    { name: 'Explore Programs', href: '/programs', protected: true },
     { name: 'Take Career Test', href: '/career-test', protected: true },
     { name: 'About', href: '/about' },
   ] : [
@@ -98,8 +100,14 @@ const Header = () => {
                     variant="ghost" 
                     size="sm"
                     onClick={() => setShowCart(true)}
+                    className="relative"
                   >
                     <ShoppingCart className="h-4 w-4" />
+                    {cartCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-kiki-purple-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                        {cartCount}
+                      </span>
+                    )}
                   </Button>
                 </>
               )}
@@ -236,6 +244,7 @@ const Header = () => {
           <Cart
             isOpen={showCart}
             onClose={() => setShowCart(false)}
+            onCartUpdate={() => {}} // Cart will auto-refresh via context
           />
         </>
       )}

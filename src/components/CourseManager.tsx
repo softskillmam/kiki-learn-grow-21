@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -101,7 +102,7 @@ const CourseManager: React.FC = () => {
     setFormData({
       title: '',
       description: '',
-      image_url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400',
+      image_url: '',
       price: '',
       original_price: '',
       duration: '',
@@ -300,7 +301,7 @@ const CourseManager: React.FC = () => {
                 id="image_url"
                 value={formData.image_url}
                 onChange={(e) => setFormData({...formData, image_url: e.target.value})}
-                placeholder="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400"
+                placeholder="https://example.com/image.jpg"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">

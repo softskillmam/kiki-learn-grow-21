@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
@@ -11,7 +12,7 @@ const FeaturedPrograms = () => {
       id: 2,
       title: "Spoken English Class",
       description: "Master fluent English communication and build confidence in speaking",
-      image: "https://syhwdpvhoydnpajyxcpz.supabase.co/storage/v1/object/public/public-images/spoken-english-class.png",
+      image: "/lovable-uploads/ab749e7b-7e24-4d9e-b411-43bc73b0ed39.png",
       price: "₹1,999",
       originalPrice: "₹2,999",
       duration: "8 weeks",
@@ -25,7 +26,7 @@ const FeaturedPrograms = () => {
       id: 4,
       title: "Soft Skill Training",
       description: "Develop essential soft skills for personal and professional success",
-      image: "https://syhwdpvhoydnpajyxcpz.supabase.co/storage/v1/object/public/public-images/soft-skill-training.png",
+      image: "/lovable-uploads/d25e1c5a-1fb9-4781-add1-43899f865741.png",
       price: "₹3,499",
       originalPrice: "₹4,999",
       duration: "4 weeks",
@@ -39,7 +40,7 @@ const FeaturedPrograms = () => {
       id: 5,
       title: "Public Speaking",
       description: "Overcome stage fear and become a confident public speaker",
-      image: "https://syhwdpvhoydnpajyxcpz.supabase.co/storage/v1/object/public/public-images/public-speaking.png",
+      image: "/lovable-uploads/9a4c6801-fcf4-4a3e-958c-116d313d908d.png",
       price: "₹2,499",
       originalPrice: "₹3,499",
       duration: "3 weeks",

@@ -4,15 +4,20 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Users, Star, Phone, MapPin } from 'lucide-react';
+import { Clock, Users, Star, Phone, MapPin, ShoppingCart } from 'lucide-react';
+import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Programs = () => {
+  const { addToCart } = useCart();
+  const { isAuthenticated } = useAuth();
+
   const programs = [
     {
       id: 1,
       title: "Art & Craft Classes",
       description: "Explore creativity through various art and craft activities. Perfect for developing artistic skills and imagination.",
-      image: "https://syhwdpvhoydnpajyxcpz.supabase.co/storage/v1/object/public/public-images/art-craft-classes.png",
+      image: "/lovable-uploads/fd7df4fd-8fe5-4faa-9801-d3aabccc5157.png",
       price: "₹1,500",
       originalPrice: "₹2,000",
       duration: "4 weeks",
@@ -26,7 +31,7 @@ const Programs = () => {
       id: 2,
       title: "Spoken English Class",
       description: "Master fluent English communication and build confidence in speaking with native-like fluency.",
-      image: "https://syhwdpvhoydnpajyxcpz.supabase.co/storage/v1/object/public/public-images/spoken-english-class.png",
+      image: "/lovable-uploads/ab749e7b-7e24-4d9e-b411-43bc73b0ed39.png",
       price: "₹1,999",
       originalPrice: "₹2,999",
       duration: "8 weeks",
@@ -40,7 +45,7 @@ const Programs = () => {
       id: 3,
       title: "Spoken Hindi Class",
       description: "Learn to speak Hindi fluently with proper pronunciation and grammar for effective communication.",
-      image: "https://syhwdpvhoydnpajyxcpz.supabase.co/storage/v1/object/public/public-images/spoken-hindi-class.png",
+      image: "/lovable-uploads/c07edaf9-7666-4790-8fd5-aa7c87e82621.png",
       price: "₹1,799",
       originalPrice: "₹2,499",
       duration: "6 weeks",
@@ -54,7 +59,7 @@ const Programs = () => {
       id: 4,
       title: "Soft Skill Training",
       description: "Develop essential soft skills for personal and professional success in today's competitive world.",
-      image: "https://syhwdpvhoydnpajyxcpz.supabase.co/storage/v1/object/public/public-images/soft-skill-training.png",
+      image: "/lovable-uploads/d25e1c5a-1fb9-4781-add1-43899f865741.png",
       price: "₹3,499",
       originalPrice: "₹4,999",
       duration: "4 weeks",
@@ -68,7 +73,7 @@ const Programs = () => {
       id: 5,
       title: "Public Speaking",
       description: "Overcome stage fear and become a confident public speaker with proven techniques and practice.",
-      image: "https://syhwdpvhoydnpajyxcpz.supabase.co/storage/v1/object/public/public-images/public-speaking.png",
+      image: "/lovable-uploads/9a4c6801-fcf4-4a3e-958c-116d313d908d.png",
       price: "₹2,499",
       originalPrice: "₹3,499",
       duration: "3 weeks",
@@ -82,7 +87,7 @@ const Programs = () => {
       id: 6,
       title: "Personality Development Class",
       description: "Transform your personality and build self-confidence for personal and professional growth.",
-      image: "https://syhwdpvhoydnpajyxcpz.supabase.co/storage/v1/object/public/public-images/personality-development.png",
+      image: "/lovable-uploads/eea1d960-780b-4db1-89ab-648014f584d0.png",
       price: "₹2,999",
       originalPrice: "₹4,499",
       duration: "6 weeks",
@@ -96,7 +101,7 @@ const Programs = () => {
       id: 7,
       title: "Career Counseling",
       description: "Get expert guidance for career planning and make informed decisions about your future path.",
-      image: "https://syhwdpvhoydnpajyxcpz.supabase.co/storage/v1/object/public/public-images/career-counseling.png",
+      image: "/lovable-uploads/96cfbc73-aed1-4bef-9de8-5b597d0e461f.png",
       price: "₹1,999",
       originalPrice: "₹2,999",
       duration: "2 sessions",
@@ -110,7 +115,7 @@ const Programs = () => {
       id: 8,
       title: "Health Insurance",
       description: "Understand health insurance policies and make the right choices for you and your family's wellbeing.",
-      image: "https://syhwdpvhoydnpajyxcpz.supabase.co/storage/v1/object/public/public-images/health-insurance.png",
+      image: "/lovable-uploads/beb09b19-fd17-434b-8096-e9a42a070078.png",
       price: "₹999",
       originalPrice: "₹1,499",
       duration: "1 session",
@@ -124,7 +129,7 @@ const Programs = () => {
       id: 9,
       title: "Tarot Reading",
       description: "Discover insights into your life path through professional tarot card reading sessions.",
-      image: "https://syhwdpvhoydnpajyxcpz.supabase.co/storage/v1/object/public/public-images/tarot-reading.png",
+      image: "/lovable-uploads/8b5de2fa-aca2-40f2-9170-0af6794ef7fc.png",
       price: "₹1,299",
       originalPrice: "₹1,999",
       duration: "1 session",
@@ -138,7 +143,7 @@ const Programs = () => {
       id: 10,
       title: "Business Consulting",
       description: "Get expert advice for starting and growing your business with proven strategies and insights.",
-      image: "https://syhwdpvhoydnpajyxcpz.supabase.co/storage/v1/object/public/public-images/business-consulting.png",
+      image: "/lovable-uploads/aab35988-5b49-4486-86d5-cc8a330fd4c9.png",
       price: "₹4,999",
       originalPrice: "₹7,499",
       duration: "3 sessions",
@@ -153,6 +158,10 @@ const Programs = () => {
   const handleEnrollNow = (programTitle: string) => {
     // Simple contact action for now
     window.open(`tel:8220879805`, '_self');
+  };
+
+  const handleAddToCart = async (programId: number) => {
+    await addToCart(programId.toString());
   };
 
   return (
@@ -248,13 +257,23 @@ const Programs = () => {
                     </div>
                   </CardContent>
 
-                  <CardFooter className="p-4 pt-0">
+                  <CardFooter className="p-4 pt-0 space-y-2">
                     <Button 
                       onClick={() => handleEnrollNow(program.title)}
                       className="w-full bg-kiki-purple-600 hover:bg-kiki-purple-700 text-sm"
                     >
                       Enroll Now
                     </Button>
+                    {isAuthenticated && (
+                      <Button 
+                        onClick={() => handleAddToCart(program.id)}
+                        variant="outline"
+                        className="w-full text-sm"
+                      >
+                        <ShoppingCart className="h-4 w-4 mr-2" />
+                        Add to Cart
+                      </Button>
+                    )}
                   </CardFooter>
                 </Card>
               ))}
