@@ -1,13 +1,17 @@
-
 import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Users, Star, Phone, MapPin } from 'lucide-react';
+import { Clock, Users, Star, Phone, MapPin, ShoppingCart } from 'lucide-react';
+import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Programs = () => {
+  const { addToCart } = useCart();
+  const { isAuthenticated } = useAuth();
+
   const programs = [
     {
       id: 1,
@@ -156,6 +160,10 @@ const Programs = () => {
     window.open(`tel:8220879805`, '_self');
   };
 
+  const handleAddToCart = async (programId: number) => {
+    await addToCart(programId.toString());
+  };
+
   return (
     <div className="min-h-screen">
       <Header />
@@ -249,13 +257,23 @@ const Programs = () => {
                     </div>
                   </CardContent>
 
-                  <CardFooter className="p-4 pt-0">
+                  <CardFooter className="p-4 pt-0 space-y-2">
                     <Button 
                       onClick={() => handleEnrollNow(program.title)}
                       className="w-full bg-kiki-purple-600 hover:bg-kiki-purple-700 text-sm"
                     >
                       Enroll Now
                     </Button>
+                    {isAuthenticated && (
+                      <Button 
+                        onClick={() => handleAddToCart(program.id)}
+                        variant="outline"
+                        className="w-full text-sm"
+                      >
+                        <ShoppingCart className="h-4 w-4 mr-2" />
+                        Add to Cart
+                      </Button>
+                    )}
                   </CardFooter>
                 </Card>
               ))}
