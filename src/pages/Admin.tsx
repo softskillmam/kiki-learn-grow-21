@@ -8,6 +8,7 @@ import LoginModal from '@/components/LoginModal';
 import CourseManager from '@/components/CourseManager';
 import UserManagement from '@/components/UserManagement';
 import CourseEnrollments from '@/components/CourseEnrollments';
+import UserStatistics from '@/components/UserStatistics';
 
 const Admin = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -72,6 +73,7 @@ const Admin = () => {
           <Tabs defaultValue="overview" className="space-y-6">
             <TabsList>
               <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="statistics">Statistics</TabsTrigger>
               <TabsTrigger value="courses">Courses</TabsTrigger>
               <TabsTrigger value="users">Users</TabsTrigger>
               <TabsTrigger value="enrollments">Enrollments</TabsTrigger>
@@ -120,6 +122,10 @@ const Admin = () => {
                   </div>
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="statistics">
+              <UserStatistics />
             </TabsContent>
 
             <TabsContent value="courses">
