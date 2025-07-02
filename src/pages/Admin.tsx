@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import LoginModal from '@/components/LoginModal';
 import CourseManager from '@/components/CourseManager';
+import UserManagement from '@/components/UserManagement';
+import CourseEnrollments from '@/components/CourseEnrollments';
 
 const Admin = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -71,6 +73,8 @@ const Admin = () => {
             <TabsList>
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="courses">Courses</TabsTrigger>
+              <TabsTrigger value="users">Users</TabsTrigger>
+              <TabsTrigger value="enrollments">Enrollments</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="space-y-6">
@@ -120,6 +124,14 @@ const Admin = () => {
 
             <TabsContent value="courses">
               <CourseManager />
+            </TabsContent>
+
+            <TabsContent value="users">
+              <UserManagement />
+            </TabsContent>
+
+            <TabsContent value="enrollments">
+              <CourseEnrollments />
             </TabsContent>
           </Tabs>
         </div>
